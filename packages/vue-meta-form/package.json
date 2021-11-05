@@ -1,0 +1,35 @@
+{
+	"name": "vue-meta-form",
+	"version": "0.1.0",
+	"description": "Vue component that extends all children with props",
+	"main": "dist/index.js",
+	"author": "Constantine Genchevsky <const.gen@gmail.com>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/constgen/meta-form"
+	},
+	"homepage": "https://github.com/constgen/meta-form/tree/master/packages/vue-meta-form",
+	"keywords": [
+		"vue",
+		"form",
+		"validation",
+		"data",
+		"status",
+		"context"
+	],
+	"dependencies": {
+		"vue-fragment": "^1.5.1"
+	},
+	"peerDependencies": {
+		"vue": "^2.0.0"
+	},
+	"files": [
+		"**/*.js",
+		"README.md",
+		"package.json"
+	],
+	"engines": {
+		"npm": ">=5.4.0"
+	}
+}

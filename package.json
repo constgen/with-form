@@ -1,0 +1,38 @@
+{
+	"name": "meta-form",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Components to build forms",
+	"author": "Constantine Genchevsky <const.gen@gmail.com>",
+	"license": "MIT",
+	"keywords": [
+		"react",
+		"vue",
+		"form",
+		"validation",
+		"data",
+		"status",
+		"context"
+	],
+	"scripts": {
+		"preinstall": "node -e \"!process.env.npm_config_user_agent.startsWith('pnpm/') && !console.log('Use \\`npx pnpm install\\` to install dependencies in this repository\\n') && process.exit(1)\"",
+		"eslint": "eslint ./",
+		"pretest": "npm run eslint -- --max-warnings 0",
+		"lint": "npm run eslint -- --fix"
+	},
+	"dependencies": {
+		"neutrino": "9.5.0",
+		"webpack": "^4.42.1",
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2",
+		"vue": "^2.6.11"
+	},
+	"devDependencies": {
+		"@constgen/eslint": "3.2.0",
+		"eslint": "7.18.0"
+	},
+	"engines": {
+		"npm": ">=5.4.0",
+		"pnpm": ">=4.12.0"
+	}
+}

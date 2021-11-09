@@ -4,6 +4,8 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
 import DataContext from './DataContext'
 import noop from '../utils/noop'
 
+let emptyContext = {}
+
 export default function withFormData (Component) {
 	class FormDataItem extends React.Component {
 		static displayName = Component.displayName || Component.name
@@ -62,7 +64,11 @@ export default function withFormData (Component) {
 			}
 
 			// console.info('render', { name, value, contextValue });
-			return <Component {...props} value={value} onChange={handleChange} />
+			return (
+				<DataContext.Provider value={emptyContext}>
+					<Component {...props} value={value} onChange={handleChange} />
+				</DataContext.Provider>
+			)
 		}
 	}
 	hoistNonReactStatics(FormDataItem, Component)

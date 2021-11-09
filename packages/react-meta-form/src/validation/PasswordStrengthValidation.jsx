@@ -1,25 +1,25 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from 'react'
+import PropTypes from 'prop-types'
 
-import { FormData, FormValidation } from '../form-context';
+import { FormData, FormValidation } from '../form-context'
 
 export default class PasswordStrengthValidation extends React.PureComponent {
 	static propTypes = {
-		children: PropTypes.node,
-		onChange: (FormValidation.propTypes || {}).onChange,
-		onValid: (FormValidation.propTypes || {}).onValid,
+		children : PropTypes.node,
+		onChange : (FormValidation.propTypes || {}).onChange,
+		onValid  : (FormValidation.propTypes || {}).onValid,
 		onInvalid: (FormValidation.propTypes || {}).onInvalid,
 		className: PropTypes.string,
-		strength: PropTypes.number
-	};
+		strength : PropTypes.number
+	}
 	static defaultProps = {
-		children: null,
-		onChange: FormValidation.defaultProps.onChange,
-		onValid: FormValidation.defaultProps.onValid,
+		children : null,
+		onChange : FormValidation.defaultProps.onChange,
+		onValid  : FormValidation.defaultProps.onValid,
 		onInvalid: FormValidation.defaultProps.onInvalid,
 		className: '',
-		strength: 3
-	};
+		strength : 3
+	}
 	static rules = {
 		// '^[\\s\\S]{8,64}$': 'From 8 to 64 characters',
 
@@ -29,41 +29,38 @@ export default class PasswordStrengthValidation extends React.PureComponent {
 		// '[a-z]': 'Lowercase letters'
 
 		'[\\^$@!%*#?&]': 'A special character',
-		'[A-Z]': 'An uppercase letter',
-		'[0-9]': 'At least one digit',
-		'[a-z]': 'At least one lowercase letter'
-	};
+		'[A-Z]'        : 'An uppercase letter',
+		'[0-9]'        : 'At least one digit',
+		'[a-z]'        : 'At least one lowercase letter'
+	}
 	static toViolationsFromValue (value) {
-		let { rules } = PasswordStrengthValidation;
-		let violations = Object.entries(rules)
+		let { rules } = PasswordStrengthValidation
+
+		return Object.entries(rules)
 			.filter(function ([expression]) {
-				return !new RegExp(expression).test(value);
+				return !new RegExp(expression).test(value)
 			})
 			.map(function ([, message]) {
-				return message;
-			});
-
-		return violations;
+				return message
+			})
 	}
 	static toStrengthFromViolations (violations) {
-		let { rules } = PasswordStrengthValidation;
+		let { rules } = PasswordStrengthValidation
 
-		let strength = Object.keys(rules).length - violations.length;
-
-		return strength;
+		return Object.keys(rules).length - violations.length
 	}
 	state = {
 		validation: {}
-	};
+	}
 
 	validateStrength = value => {
-		if (!value) return;
-		let { className, strength: minimalStrength } = this.props;
-		let { toViolationsFromValue, toStrengthFromViolations } = PasswordStrengthValidation;
-		let violations = toViolationsFromValue(value);
-		let strength = toStrengthFromViolations(violations);
+		if (!value) return
+		let { className, strength: minimalStrength }            = this.props
+		let { toViolationsFromValue, toStrengthFromViolations } = PasswordStrengthValidation
+		let violations                                          = toViolationsFromValue(value)
+		let strength                                            = toStrengthFromViolations(violations)
 
-		if (strength >= minimalStrength) return;
+		if (strength >= minimalStrength) return
 
 		// <React.Fragment>
 		// 		The password is too weak. To increase its strength use:
@@ -78,32 +75,32 @@ export default class PasswordStrengthValidation extends React.PureComponent {
 				<h5>Password should contain</h5>
 				<ul style={{ marginBottom: 0 }}>
 					{violations.map(function (message) {
-						return <li key={message}>{message}</li>;
+						return <li key={message}>{message}</li>
 					})}
 				</ul>
 			</React.Fragment>
-		);
+		)
 
 		if (className) {
-			validityMessage = <div className={className}>{validityMessage}</div>;
+			validityMessage = <div className={className}>{validityMessage}</div>
 		}
-		return validityMessage;
-	};
+		return validityMessage
+	}
 	handleValuesChange = values => {
-		let { validateStrength } = this;
+		let { validateStrength } = this
 
 		let validation = Object.keys(values)
 			.reduce(function (rules, name) {
-				rules[name] = validateStrength;
-				return rules;
-			}, {});
+				rules[name] = validateStrength
+				return rules
+			}, {})
 
-		this.setState({ validation });
-	};
+		this.setState({ validation })
+	}
 
 	render () {
-		let { children, onChange, onValid, onInvalid } = this.props;
-		let { validation } = this.state;
+		let { children, onChange, onValid, onInvalid } = this.props
+		let { validation }                             = this.state
 
 		return (
 			<FormValidation
@@ -116,6 +113,6 @@ export default class PasswordStrengthValidation extends React.PureComponent {
 					{children}
 				</FormData>
 			</FormValidation>
-		);
+		)
 	}
 }

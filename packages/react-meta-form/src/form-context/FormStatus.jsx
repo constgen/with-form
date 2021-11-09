@@ -10,12 +10,12 @@ export default class FormStatus extends React.PureComponent {
 		children   : PropTypes.node.isRequired,
 		onChange   : PropTypes.func,
 		onSubmitted: PropTypes.func,
-		onError    : PropTypes.func
+		onFail     : PropTypes.func
 	}
 	static defaultProps = {
 		onChange   : noop,
 		onSubmitted: noop,
-		onError    : noop
+		onFail     : noop
 	}
 	static STATUS = STATUS
 	constructor (props, context) {
@@ -46,12 +46,12 @@ export default class FormStatus extends React.PureComponent {
 		onChange(status)
 	}
 	handleError = error => {
-		let status                = STATUS.FAILED
-		let { onChange, onError } = this.props
+		let status               = STATUS.FAILED
+		let { onChange, onFail } = this.props
 
 		if (!this.mounted) return
 		this.setState({ status }) // eslint-disable-line react/no-unused-state
-		onError(error)
+		onFail(error)
 		onChange(status)
 	}
 	handleSubmit = promise => {

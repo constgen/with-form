@@ -4,6 +4,8 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
 import DataContext from './DataContext'
 import noop from '../utils/noop'
 
+let emptyContext = {}
+
 export default function withFormCheck (Component) {
 	class FormCheckItem extends React.Component {
 		static displayName = Component.displayName || Component.name
@@ -65,7 +67,11 @@ export default function withFormCheck (Component) {
 			}
 
 			// console.info('render', { name, checked, contextValue });
-			return <Component {...props} checked={checked} onChange={handleChange} />
+			return (
+				<DataContext.Provider value={emptyContext}>
+					<Component {...props} checked={checked} onChange={handleChange} />
+				</DataContext.Provider>
+			)
 		}
 	}
 	hoistNonReactStatics(FormCheckItem, Component)

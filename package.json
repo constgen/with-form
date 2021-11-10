@@ -20,7 +20,8 @@
 		"pretest": "npm run eslint -- --max-warnings 0",
 		"lint": "npm run eslint -- --fix",
 		"build": "webpack --mode production",
-		"start": "webpack --mode development"
+		"start": "webpack --mode development",
+		"postversion": "git push && git push --tags"
 	},
 	"dependencies": {
 		"react": "^17.0.2",

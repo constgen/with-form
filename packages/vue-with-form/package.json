@@ -1,5 +1,5 @@
 {
-	"name": "vue-meta-form",
+	"name": "vue-with-form",
 	"version": "0.1.0",
 	"private": true,
 	"description": "Vue component that extends all children with props",
@@ -8,9 +8,9 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/constgen/meta-form"
+		"url": "https://github.com/constgen/with-form"
 	},
-	"homepage": "https://github.com/constgen/meta-form/tree/master/packages/vue-meta-form",
+	"homepage": "https://github.com/constgen/with-form/tree/master/packages/vue-with-form",
 	"keywords": [
 		"vue",
 		"form",

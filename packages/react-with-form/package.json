@@ -1,15 +1,15 @@
 {
-	"name": "react-meta-form",
-	"version": "0.2.0",
+	"name": "react-with-form",
+	"version": "0.2.2",
 	"description": "React components to build forms",
 	"main": "dist/index.js",
 	"author": "Constantine Genchevsky <const.gen@gmail.com>",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/constgen/meta-form"
+		"url": "https://github.com/constgen/with-form"
 	},
-	"homepage": "https://github.com/constgen/meta-form/tree/master/packages/react-meta-form",
+	"homepage": "https://github.com/constgen/with-form/tree/master/packages/react-with-form",
 	"keywords": [
 		"react",
 		"form",

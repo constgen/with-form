@@ -2,7 +2,7 @@
 	"name": "react-meta-form",
 	"version": "0.1.0",
 	"description": "React components to build forms",
-	"main": "dist/main.js",
+	"main": "dist/index.js",
 	"author": "Constantine Genchevsky <const.gen@gmail.com>",
 	"license": "MIT",
 	"repository": {
@@ -23,24 +23,27 @@
 		"start": "webpack --mode development"
 	},
 	"dependencies": {
+		"hoist-non-react-statics": "3.3.2",
 		"prop-types": "^15.7.2"
 	},
 	"devDependencies": {
 		"@constgen/neutrino-mode": "~1.9.2",
-		"@constgen/neutrino-optimization": "1.12.0",
-		"@constgen/neutrino-progress": "1.9.2",
-		"@constgen/neutrino-sourcemap": "1.9.2",
+		"@constgen/neutrino-optimization": "~1.12.0",
+		"@constgen/neutrino-progress": "~1.9.2",
+		"@constgen/neutrino-sourcemap": "~1.9.2",
 		"@constgen/neutrino-react-loader": "~1.9.2",
-		"hoist-non-react-statics": "3.3.2",
-		"webpack": "^4.43.0",
-		"webpack-cli": "^3.3.12"
+		"@constgen/neutrino-analysis": "~1.9.2",
+		"@neutrinojs/clean": "9.5.0",
+		"webpack-cli": "^3.3.12",
+		"deepmerge": "4.2.2"
 	},
 	"peerDependencies": {
 		"react": "^16.0.0 || ^17.0.0"
 	},
 	"files": [
-		"**/*.js",
+		"dist/**/*",
 		"README.md",
+		"LICENSE",
 		"package.json"
 	],
 	"engines": {

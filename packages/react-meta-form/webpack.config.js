@@ -1,3 +1,3 @@
 let neutrino = require('neutrino')
 
-module.exports = neutrino().webpack()
+module.exports = neutrino(require('./.neutrinorc')).webpack()

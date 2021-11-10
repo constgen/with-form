@@ -1,6 +1,7 @@
 {
 	"name": "vue-meta-form",
 	"version": "0.1.0",
+	"private": true,
 	"description": "Vue component that extends all children with props",
 	"main": "dist/index.js",
 	"author": "Constantine Genchevsky <const.gen@gmail.com>",

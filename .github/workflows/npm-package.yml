@@ -45,6 +45,8 @@ jobs:
         uses: pnpm/action-setup@v2.0.1
         with:
           version: 6.20.1
+      - name: Install dependencies
+        run: pnpm install
       - name: Build the project
         run: pnpm build
       - name: Publish packages

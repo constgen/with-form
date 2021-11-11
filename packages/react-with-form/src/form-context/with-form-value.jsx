@@ -6,8 +6,8 @@ import noop from '../utils/noop'
 
 let emptyContext = {}
 
-export default function withFormData (Component) {
-	class FormDataItem extends React.Component {
+export default function withFormValue (Component) {
+	class FormValueItem extends React.Component {
 		static displayName = Component.displayName || Component.name
 		static Origin = Component.Origin || Component
 		static contextType = DataContext
@@ -71,7 +71,7 @@ export default function withFormData (Component) {
 			)
 		}
 	}
-	hoistNonReactStatics(FormDataItem, Component)
+	hoistNonReactStatics(FormValueItem, Component)
 
-	return FormDataItem
+	return FormValueItem
 }

@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 
 import noop from '../utils/noop'
 import RadioContext from './RadioContext'
-import { withFormData } from '../form-context'
+import { withFormValue } from '../form-context'
 
-@withFormData
+@withFormValue
 export default class RadioData extends React.PureComponent {
 	static propTypes = {
 		disabled: PropTypes.bool,

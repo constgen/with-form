@@ -5,7 +5,8 @@ import { FormData, FormValidation } from './form-context'
 import StatusContext from './form-context/StatusContext'
 import noop from './utils/noop'
 
-export default class Form extends React.Component {
+
+export default class Form extends React.PureComponent {
 	static contextType = StatusContext
 	static propTypes = {
 		onSubmit    : PropTypes.func.isRequired,
@@ -45,8 +46,13 @@ export default class Form extends React.Component {
 	componentDidMount () {
 		this.values = this.props.values
 	}
-	componentDidUpdate () {
-		this.values = { ...this.values, ...this.props.values }
+	componentDidUpdate (previousProps) {
+		let currentValues  = this.props.values
+		let previousValues = previousProps.values
+
+		if (currentValues !== previousValues) {
+			this.values = { ...this.values, ...this.props.values }
+		}
 	}
 	handleSubmit = event => {
 		let { onSubmit, onError }         = this.props

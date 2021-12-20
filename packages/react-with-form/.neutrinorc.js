@@ -45,12 +45,13 @@ function umdPreset(customSettings = {}){
 		neutrino.use(sourcemap({prod: true, dev: true}))
       neutrino.use(reactLoader())
 
+		Object.entries(neutrino.options.mains).forEach(([name, config]) =>
+			neutrino.config.entry(name).add(config.entry)
+		);
+
 		neutrino.config
 			.target('web')
 			.context(neutrino.options.root)
-			.entry('index')
-				.add(neutrino.options.mains.index.entry)
-				.end()
 			.output
 				.path(neutrino.options.output)
 				.publicPath('./')

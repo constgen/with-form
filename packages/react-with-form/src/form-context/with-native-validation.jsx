@@ -31,6 +31,47 @@ export default function withNativeValidation (Component) {
 		}
 
 		componentDidMount () {
+			this.validate()
+		}
+
+		componentDidUpdate (previousProps, previousState) {
+			let { disabled, silent, validator } = this
+			let { value, checked, hint, valid } = this.props
+			let valueHasChanged                 = value !== previousProps.value
+			let checkedHasChanged               = checked !== previousProps.checked
+			let childrenHasChanged              = hint !== previousProps.hint
+			let validHasChanged                 = valid !== previousProps.valid
+			let disabledHasChanged              = disabled !== previousState.disabled
+			let silentHasChanged                = silent !== previousState.silent
+			let validatorHasChanged             = validator !== previousState.validator
+
+			if (valueHasChanged
+				|| checkedHasChanged
+				|| childrenHasChanged
+				|| validHasChanged
+				|| disabledHasChanged
+				|| silentHasChanged
+				|| validatorHasChanged
+			) {
+				this.validate()
+			}
+		}
+
+		get validator () {
+			let { name }       = this.props
+			let { validation } = this.context
+
+			return validation && validation[name]
+		}
+
+		get disabled () {
+			return this.context.disabled
+		}
+		get silent () {
+			return this.context.silent
+		}
+
+		validate () {
 			let { validator, disabled, silent } = this
 			let { value, valid, hint }          = this.props
 			let hasOwnValid                     = valid !== undefined
@@ -68,56 +109,22 @@ export default function withNativeValidation (Component) {
 			}, this.handleChange)
 		}
 
-		componentDidUpdate (previousProps, previousState) {
-			let { disabled, silent, validator } = this
-			let { value, checked, hint, valid } = this.props
-			let valueHasChanged                 = value !== previousProps.value
-			let checkedHasChanged               = checked !== previousProps.checked
-			let childrenHasChanged              = hint !== previousProps.hint
-			let validHasChanged                 = valid !== previousProps.valid
-			let disabledHasChanged              = disabled !== previousState.disabled
-			let silentHasChanged                = silent !== previousState.silent
-			let validatorHasChanged             = validator !== previousState.validator
-
-			if (valueHasChanged
-				|| checkedHasChanged
-				|| childrenHasChanged
-				|| validHasChanged
-				|| disabledHasChanged
-				|| silentHasChanged
-				|| validatorHasChanged
-			) {
-				this.componentDidMount()
-			}
-		}
-
-		get validator () {
-			let { name }       = this.props
-			let { validation } = this.context
-
-			return validation && validation[name]
-		}
-
-		get disabled () {
-			return this.context.disabled
-		}
-		get silent () {
-			return this.context.silent
-		}
-
 		validateNatively () {
-			let nativeElement         = this.field.current
+			let nativeElement = this.field.current
+
+			if (!nativeElement) return
+
 			let valid                 = nativeElement.checkValidity()
 			let { validationMessage } = nativeElement
 
-			return valid ? null : validationMessage
+			return valid ? undefined : validationMessage
 		}
 
 		validateContextually (value) {
 			let { validator }            = this
 			let contextValidationMessage = validator && validator(value)
 
-			return contextValidationMessage || null
+			return contextValidationMessage || undefined
 		}
 
 		handleChange = () => {

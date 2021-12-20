@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { FormData, FormValidation } from '../form-context'
+import { FormValidation } from '../form-context'
+import RegExpValidation from './RegExpValidation'
 
 export default class IpValidation extends React.PureComponent {
 	static propTypes = {
@@ -26,57 +27,23 @@ export default class IpValidation extends React.PureComponent {
 		'^.{1,3}\\..{1,3}\\..{1,3}\\..{1,3}$'                           : 'IPv4 must contain 4 octets separated by periods',
 		'^[\\d.]+$'                                                     : 'IPv4 can contain only numbers and periods'
 	}
-	state = {
-		validation: {}
-	}
-
-	validateIp = value => {
-		if (!value) return
-		let { className } = this.props
-		let violation     = Object.entries(IpValidation.rules)
-			.map(function toRegExp ([expression, message]) {
-				return {
-					expression: new RegExp(expression),
-					message
-				}
-			})
-			.find(function validate ({ expression }) {
-				return !expression.test(value)
-			})
-
-		if (!violation) return
-		if (className) {
-			return <div className={className}>{violation.message}</div>
-		}
-		return violation.message
-	}
-	handleValuesChange = values => {
-		let { validateIp } = this
-
-		let validation = Object.keys(values)
-			.reduce(function (rules, name) {
-				rules[name] = validateIp
-				return rules
-			}, {})
-
-		this.setState({ validation })
-	}
 
 	render () {
-		let { children, onChange, onValid, onInvalid } = this.props
-		let { validation }                             = this.state
+		let {
+			children, onChange, onValid, onInvalid, className
+		} = this.props
+		let { rules } = this.constructor
 
 		return (
-			<FormValidation
-				validation={validation}
+			<RegExpValidation
+				rules={rules}
+				className={className}
 				onChange={onChange}
 				onValid={onValid}
 				onInvalid={onInvalid}
 			>
-				<FormData onChange={this.handleValuesChange}>
-					{children}
-				</FormData>
-			</FormValidation>
+				{children}
+			</RegExpValidation>
 		)
 	}
 }

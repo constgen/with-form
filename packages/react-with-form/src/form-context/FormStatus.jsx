@@ -15,7 +15,7 @@ export default class FormStatus extends React.PureComponent {
 	static defaultProps = {
 		onChange   : noop,
 		onSubmitted: noop,
-		onFail     : noop
+		onFail     : console.error
 	}
 	static STATUS = STATUS
 	constructor (props, context) {

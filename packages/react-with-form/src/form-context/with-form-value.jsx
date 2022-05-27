@@ -20,12 +20,18 @@ export default function withFormValue (Component) {
 		}
 
 		componentDidMount () {
-			let { onChange: contextOnchange } = this.context
-			let { name, value }               = this.props
-			let hasOwnValue                   = value !== undefined
+			let { onChange: contextOnchange, values } = this.context
+			let { name, value }                       = this.props
+			let hasOwnValue                           = value !== undefined
+			let hasContextValue                       = values && (name in values)
 
-			if (name && contextOnchange && hasOwnValue) {
-				contextOnchange({ [name]: value })
+			if (name && contextOnchange) {
+				if (hasOwnValue) {
+					contextOnchange({ [name]: value })
+				}
+				else if (hasContextValue) {
+					contextOnchange({ [name]: values[name] })
+				}
 			}
 		}
 
@@ -43,7 +49,6 @@ export default function withFormValue (Component) {
 				contextOnchange({ [name]: value })
 			}
 		}
-
 
 		componentWillUnmount () {
 			let { onChange: contextOnchange } = this.context

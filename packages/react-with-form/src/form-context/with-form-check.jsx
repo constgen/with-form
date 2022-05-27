@@ -21,13 +21,22 @@ export default function withFormCheck (Component) {
 		}
 
 		componentDidMount () {
-			let { onChange: contextOnchange } = this.context
-			let { name, value, checked }      = this.props
-			let hasOwnChecked                 = checked !== undefined
+			let { onChange: contextOnchange, values } = this.context
+			let { name, value, checked }              = this.props
+			let hasOwnChecked                         = checked !== undefined
+			let hasContextValue                       = values && (name in values)
+			let contextValue                          = hasContextValue ? values[name] : undefined
 
-			value = checked ? value : undefined
-			if (name && contextOnchange && hasOwnChecked) {
-				contextOnchange({ [name]: value })
+			if (!(name && contextOnchange)) return
+
+			if (hasOwnChecked && hasContextValue) {
+				contextOnchange({ [name]: checked ? contextValue : undefined })
+			}
+			else if (hasOwnChecked) {
+				contextOnchange({ [name]: checked ? value : undefined })
+			}
+			else if (hasContextValue) {
+				contextOnchange({ [name]: contextValue || undefined })
 			}
 		}
 

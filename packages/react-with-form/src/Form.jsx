@@ -63,13 +63,19 @@ export default class Form extends React.PureComponent {
 		this.setState({ submitted: true })
 
 		if (valid) {
-			let whenSubmitted = Promise.resolve(this.values).then(onSubmit)
+			let whenSubmitted = Promise.resolve(this.values)
+				.then(onSubmit)
+				.then(this.handleSuccess)
 
 			contextOnSubmit(whenSubmitted)
 		}
 		else {
 			onError(this.values)
 		}
+	}
+	handleSuccess = result => {
+		this.setState({ submitted: false })
+		return result
 	}
 	handleReset = event => {
 		event.preventDefault()

@@ -23,44 +23,49 @@ export default class RegExpValidation extends React.PureComponent {
 		onInvalid: FormValidation.defaultProps.onInvalid,
 		className: undefined
 	}
-	state = {
-		validation: {}
-	}
+	static getDerivedStateFromProps (props, state) {
+		let { values } = state
 
-	validate = value => {
-		if (!value) return
-		let { className, rules } = this.props
-		let violation            = Object.entries(rules)
-			.map(function toRegExp ([expression, message]) {
-				return {
-					expression: new RegExp(expression),
-					message
-				}
-			})
-			.find(function validate ({ expression }) {
-				return !expression.test(value)
-			})
+		function validate (value) {
+			if (!value) return
+			let { className, rules } = props
+			let violation            = Object.entries(rules)
+				.map(function toRegExp ([expression, message]) {
+					return {
+						expression: new RegExp(expression),
+						message
+					}
+				})
+				.find(function isInvalid ({ expression }) {
+					return !expression.test(value)
+				})
 
-		if (!violation) return
-		let violationMessage = typeof violation.message === 'function' ? violation.message(value) : violation.message
+			if (!violation) return
+			let violationMessage = typeof violation.message === 'function' ? violation.message(value) : violation.message
 
-		if (!violationMessage) throw new TypeError('Rule message must be a not empty string or a function that returns a truethy value')
+			if (!violationMessage) throw new TypeError('Rule message must be a not empty string or a function that returns a truethy value')
 
-		if (className) {
-			return <div className={className}>{violationMessage}</div>
+			if (className) {
+				return <div className={className}>{violationMessage}</div>
+			}
+			return violationMessage
 		}
-		return violationMessage
-	}
-	handleValuesChange = values => {
-		let { validate } = this
 
 		let validation = Object.keys(values)
-			.reduce(function (rules, name) {
-				rules[name] = validate
-				return rules
+			.reduce(function (validationRules, name) {
+				validationRules[name] = validate
+				return validationRules
 			}, {})
 
-		this.setState({ validation })
+		return { validation }
+	}
+	state = {
+		validation: {},
+		values    : {}
+	}
+
+	handleValuesChange = values => {
+		this.setState({ values })
 	}
 
 	render () {

@@ -51,15 +51,13 @@ export default class FormData extends React.Component {
 	}
 	handleChange = newValues => {
 		let { onChange }                         = this.props
+		let { values }                           = this.state
 		let { onChange: contextOnChange = noop } = this.context
+		let state                                = { values: { ...values, ...newValues } }
 
-		this.setState(function ({ values }) {
-			let state = { values: { ...values, ...newValues } }
-
-			onChange(state.values)
-			contextOnChange(newValues)
-			return state
-		})
+		this.setState(state)
+		onChange(state.values)
+		contextOnChange(newValues)
 	}
 
 	render () {

@@ -1,6 +1,6 @@
 {
 	"name": "with-form",
-	"version": "0.5.2",
+	"version": "0.5.3",
 	"private": true,
 	"description": "Components to build forms",
 	"author": "Constantine Genchevsky <const.gen@gmail.com>",

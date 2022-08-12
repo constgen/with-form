@@ -8,6 +8,7 @@ export default class RegExpValidation extends React.PureComponent {
 		children: PropTypes.node,
 		rules   : PropTypes.objectOf(PropTypes.oneOfType([
 			PropTypes.string,
+			PropTypes.node,
 			PropTypes.func
 		]).isRequired),
 		onChange : (FormValidation.propTypes || {}).onChange,

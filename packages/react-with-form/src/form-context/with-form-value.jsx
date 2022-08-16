@@ -51,11 +51,11 @@ export default function withFormValue (Component) {
 		}
 
 		componentWillUnmount () {
-			let { onChange: contextOnChange } = this.context
+			let { onRemove: contextOnRemove } = this.context
 			let { name }                      = this.props
 
-			if (name && contextOnChange) {
-				contextOnChange({ [name]: undefined })
+			if (name && contextOnRemove) {
+				contextOnRemove(name)
 			}
 		}
 

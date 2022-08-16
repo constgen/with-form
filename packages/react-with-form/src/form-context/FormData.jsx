@@ -32,9 +32,11 @@ export default class FormData extends React.Component {
 		this.state = {
 			values       : {},
 			initialValues: {},
-			onChange     : this.handleChange
+			onChange     : this.handleChange,
+			onRemove     : this.handleRemove
 		}
 	}
+
 	get values () {
 		let { defaultProps }          = FormData
 		let { context, state, props } = this
@@ -49,6 +51,7 @@ export default class FormData extends React.Component {
 		}
 		return state.values
 	}
+
 	handleChange = newValues => {
 		let { onChange }                         = this.props
 		let { values }                           = this.state
@@ -60,17 +63,35 @@ export default class FormData extends React.Component {
 		contextOnChange(newValues)
 	}
 
+	handleRemove = obsoleteName => {
+		let { onChange }                         = this.props
+		let { onRemove: contextOnRemove = noop } = this.context
+		let state                                = {}
+
+		this.setState(function ({ values }) {
+			let { [obsoleteName]: obsoleteValue, ...cleanedValues } = values // eslint-disable-line no-unused-vars
+
+			state = { values: cleanedValues }
+
+			return state
+		}, function () {
+			onChange(state.values)
+			contextOnRemove(obsoleteName)
+		})
+	}
+
 	render () {
-		let { children }         = this.props
-		let { values, onChange } = this.state
-		let combinatedValues     = this.values
-		let conextValuesIsUsed   = values !== combinatedValues
-		let providerValue        = this.state
+		let { children }                   = this.props
+		let { values, onChange, onRemove } = this.state
+		let combinatedValues               = this.values
+		let conextValuesIsUsed             = values !== combinatedValues
+		let providerValue                  = this.state
 
 		if (conextValuesIsUsed) {
 			providerValue = {
 				values: combinatedValues,
-				onChange
+				onChange,
+				onRemove
 			}
 		}
 

@@ -20,23 +20,23 @@ export default function withFormValue (Component) {
 		}
 
 		componentDidMount () {
-			let { onChange: contextOnchange, values } = this.context
+			let { onChange: contextOnChange, values } = this.context
 			let { name, value }                       = this.props
 			let hasOwnValue                           = value !== undefined
 			let hasContextValue                       = values && (name in values)
 
-			if (name && contextOnchange) {
+			if (name && contextOnChange) {
 				if (hasOwnValue) {
-					contextOnchange({ [name]: value })
+					contextOnChange({ [name]: value })
 				}
 				else if (hasContextValue) {
-					contextOnchange({ [name]: values[name] })
+					contextOnChange({ [name]: values[name] })
 				}
 			}
 		}
 
 		componentDidUpdate (previousProps) {
-			let { onChange: contextOnchange, values } = this.context
+			let { onChange: contextOnChange, values } = this.context
 			let { name, value }                       = this.props
 			let hasOwnValue                           = value !== undefined
 			let newValuePassed                        = value !== previousProps.value
@@ -44,27 +44,27 @@ export default function withFormValue (Component) {
 			// let contextValue = values && values[name]
 			// let valueChanged = value !== contextValue
 
-			if (name && contextOnchange && hasOwnValue && (newValuePassed || hasNotContextValue)) {
+			if (name && contextOnChange && hasOwnValue && (newValuePassed || hasNotContextValue)) {
 				// console.log('updates', { name, value, newValuePassed, hasNotContextValue });
-				contextOnchange({ [name]: value })
+				contextOnChange({ [name]: value })
 			}
 		}
 
 		componentWillUnmount () {
-			let { onChange: contextOnchange } = this.context
+			let { onChange: contextOnChange } = this.context
 			let { name }                      = this.props
 
-			if (name && contextOnchange) {
-				contextOnchange({ [name]: undefined })
+			if (name && contextOnChange) {
+				contextOnChange({ [name]: undefined })
 			}
 		}
 
 		handleChange = value => {
 			let { name, onChange } = this.props
-			let contextOnchange    = this.context.onChange
+			let contextOnChange    = this.context.onChange
 
-			if (name && contextOnchange) {
-				contextOnchange({ [name]: value })
+			if (name && contextOnChange) {
+				contextOnChange({ [name]: value })
 			}
 			onChange(value)
 		}

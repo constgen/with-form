@@ -21,27 +21,27 @@ export default function withFormCheck (Component) {
 		}
 
 		componentDidMount () {
-			let { onChange: contextOnchange, values } = this.context
+			let { onChange: contextOnChange, values } = this.context
 			let { name, value, checked }              = this.props
 			let hasOwnChecked                         = checked !== undefined
 			let hasContextValue                       = values && (name in values)
 			let contextValue                          = hasContextValue ? values[name] : undefined
 
-			if (!(name && contextOnchange)) return
+			if (!(name && contextOnChange)) return
 
 			if (hasOwnChecked && hasContextValue) {
-				contextOnchange({ [name]: checked ? contextValue : undefined })
+				contextOnChange({ [name]: checked ? contextValue : undefined })
 			}
 			else if (hasOwnChecked) {
-				contextOnchange({ [name]: checked ? value : undefined })
+				contextOnChange({ [name]: checked ? value : undefined })
 			}
 			else if (hasContextValue) {
-				contextOnchange({ [name]: contextValue || undefined })
+				contextOnChange({ [name]: contextValue || undefined })
 			}
 		}
 
 		componentDidUpdate (previousProps) {
-			let { onChange: contextOnchange, values } = this.context
+			let { onChange: contextOnChange, values } = this.context
 			let { name, value, checked }              = this.props
 			let hasOwnChecked                         = checked !== undefined
 			let newCheckPassed                        = checked !== previousProps.checked
@@ -50,27 +50,27 @@ export default function withFormCheck (Component) {
 			// let contextValue = values && values[name]
 			// let valueChanged = value !== contextValue
 			value = checked ? value : undefined
-			if (name && contextOnchange && hasOwnChecked && (newCheckPassed || hasNotContextValue)) {
+			if (name && contextOnChange && hasOwnChecked && (newCheckPassed || hasNotContextValue)) {
 				// console.log('updates', { name, value, newValuePassed, hasNotContextValue });
-				contextOnchange({ [name]: value })
+				contextOnChange({ [name]: value })
 			}
 		}
 
 		componentWillUnmount () {
-			let { onChange: contextOnchange } = this.context
+			let { onChange: contextOnChange } = this.context
 			let { name }                      = this.props
 
-			if (name && contextOnchange) {
-				contextOnchange({ [name]: undefined })
+			if (name && contextOnChange) {
+				contextOnChange({ [name]: undefined })
 			}
 		}
 
 		handleChange = value => {
 			let { name, onChange } = this.props
-			let contextOnchange    = this.context.onChange
+			let contextOnChange    = this.context.onChange
 
-			if (name && contextOnchange) {
-				contextOnchange({ [name]: value })
+			if (name && contextOnChange) {
+				contextOnChange({ [name]: value })
 			}
 			onChange(value)
 		}

@@ -28,7 +28,7 @@ export default class EqualityValidation extends React.PureComponent {
 	handleValuesChange = values => {
 		let { message, className, name: originName } = this.props
 		let validityMessage                          = message || `This field must match with "${originName}".`
-		let validation
+		let validation                               = {}
 
 		if (className) {
 			validityMessage = <div className={className}>{validityMessage}</div>

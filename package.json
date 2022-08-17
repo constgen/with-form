@@ -16,7 +16,7 @@
 	],
 	"scripts": {
 		"preinstall": "node -e \"!process.env.npm_config_user_agent.startsWith('pnpm/') && !console.log('Use \\`npx pnpm install\\` to install dependencies in this repository\\n') && process.exit(1)\"",
-		"eslint": "eslint ./",
+		"eslint": "eslint ./packages --cache --cache-location ./.cache/.eslintcache",
 		"pretest": "npm run eslint -- --max-warnings 0",
 		"lint": "npm run eslint -- --fix",
 		"build": "webpack --mode production",

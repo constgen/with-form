@@ -37,6 +37,12 @@ export default class FormData extends React.Component {
 		}
 	}
 
+	componentDidMount () {
+		let { onChange } = this.props
+
+		onChange(this.values)
+	}
+
 	get values () {
 		let { defaultProps }          = FormData
 		let { context, state, props } = this

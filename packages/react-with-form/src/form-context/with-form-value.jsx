@@ -23,13 +23,13 @@ export default function withFormValue (Component) {
 			let { onChange: contextOnChange, values } = this.context
 			let { name, value }                       = this.props
 			let hasOwnValue                           = value !== undefined
-			let hasContextValue                       = values && (name in values)
+			let hasNotContextValue                    = !(values && (name in values))
 
 			if (name && contextOnChange) {
 				if (hasOwnValue) {
 					contextOnChange({ [name]: value })
 				}
-				else if (hasContextValue) {
+				else if (hasNotContextValue) {
 					contextOnChange({ [name]: values[name] })
 				}
 			}

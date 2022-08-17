@@ -35,9 +35,6 @@ export default function withFormCheck (Component) {
 			else if (hasOwnChecked) {
 				contextOnChange({ [name]: checked ? value : undefined })
 			}
-			else if (hasContextValue) {
-				contextOnChange({ [name]: contextValue || undefined })
-			}
 		}
 
 		componentDidUpdate (previousProps) {

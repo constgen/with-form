@@ -1,6 +1,6 @@
 {
 	"name": "react-with-form",
-	"version": "0.5.4",
+	"version": "0.5.5",
 	"description": "React components to build forms",
 	"main": "dist/index.js",
 	"author": "Constantine Genchevsky <const.gen@gmail.com>",
@@ -38,7 +38,7 @@
 		"deepmerge": "4.2.2"
 	},
 	"peerDependencies": {
-		"react": "^16.0.0 || ^17.0.0"
+		"react": "^16.0.0 || ^17.0.0 || ^18.0.0"
 	},
 	"files": [
 		"dist/**/*",

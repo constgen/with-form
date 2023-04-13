@@ -66,7 +66,7 @@ export default function withFormValue (Component) {
 			if (name && contextOnChange) {
 				contextOnChange({ [name]: value })
 			}
-			onChange(value)
+			return onChange(value)
 		}
 		render () {
 			let { props, context, handleChange } = this

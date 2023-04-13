@@ -99,7 +99,6 @@ export default function withNativeValidation (Component) {
 				}
 			}
 
-			// eslint-disable-next-line react/no-did-mount-set-state
 			this.setState({
 				valid,
 				error,

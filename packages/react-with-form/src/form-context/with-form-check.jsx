@@ -25,6 +25,7 @@ export default function withFormCheck (Component) {
 			let { name, value, checked }              = this.props
 			let hasOwnChecked                         = checked !== undefined
 			let hasContextValue                       = values && (name in values)
+			let hasNotContextValue                    = !hasContextValue
 			let contextValue                          = hasContextValue ? values[name] : undefined
 
 			if (!(name && contextOnChange)) return
@@ -32,7 +33,7 @@ export default function withFormCheck (Component) {
 			if (hasOwnChecked && hasContextValue) {
 				contextOnChange({ [name]: checked ? contextValue : undefined })
 			}
-			else if (hasOwnChecked) {
+			else if (hasOwnChecked || hasNotContextValue) {
 				contextOnChange({ [name]: checked ? value : undefined })
 			}
 		}
@@ -48,7 +49,7 @@ export default function withFormCheck (Component) {
 			// let valueChanged = value !== contextValue
 			value = checked ? value : undefined
 			if (name && contextOnChange && hasOwnChecked && (newCheckPassed || hasNotContextValue)) {
-				// console.log('updates', { name, value, newValuePassed, hasNotContextValue });
+				// console.info('updates', { name, value, newValuePassed, hasNotContextValue });
 				contextOnChange({ [name]: value })
 			}
 		}

@@ -25,13 +25,9 @@ export default function withFormValue (Component) {
 			let hasOwnValue                           = value !== undefined
 			let hasNotContextValue                    = !(values && (name in values))
 
-			if (name && contextOnChange) {
-				if (hasOwnValue) {
-					contextOnChange({ [name]: value })
-				}
-				else if (hasNotContextValue) {
-					contextOnChange({ [name]: values[name] })
-				}
+			if (name && contextOnChange && (hasOwnValue || hasNotContextValue)) {
+				// console.info('mount', { name, value, hasOwnValue })
+				contextOnChange({ [name]: value })
 			}
 		}
 
@@ -45,7 +41,7 @@ export default function withFormValue (Component) {
 			// let valueChanged = value !== contextValue
 
 			if (name && contextOnChange && hasOwnValue && (newValuePassed || hasNotContextValue)) {
-				// console.log('updates', { name, value, newValuePassed, hasNotContextValue });
+				// console.info('updates', { name, value, newValuePassed, hasNotContextValue })
 				contextOnChange({ [name]: value })
 			}
 		}

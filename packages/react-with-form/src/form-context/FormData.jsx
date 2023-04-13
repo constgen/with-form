@@ -29,18 +29,24 @@ export default class FormData extends React.Component {
 	constructor (props, context) {
 		super(props, context)
 
-		this.state = {
+		this.state   = {
 			values       : {},
 			initialValues: {},
 			onChange     : this.handleChange,
 			onRemove     : this.handleRemove
 		}
+		this.mounted = false
 	}
 
 	componentDidMount () {
 		let { onChange } = this.props
+		let component    = this
 
-		onChange(this.values)
+		this.mounted = true
+		// eslint-disable-next-line react/no-did-mount-set-state
+		this.setState(null, function () {
+			onChange(component.values)
+		})
 	}
 
 	get values () {
@@ -60,28 +66,36 @@ export default class FormData extends React.Component {
 
 	handleChange = newValues => {
 		let { onChange }                         = this.props
-		let { values }                           = this.state
 		let { onChange: contextOnChange = noop } = this.context
-		let state                                = { values: { ...values, ...newValues } }
+		let { mounted }                          = this
+		let state                                = { }
 
-		this.setState(state)
-		onChange(state.values)
-		contextOnChange(newValues)
+		this.setState(function ({ values }) {
+			state = { values: { ...values, ...newValues } }
+			return state
+		}, function () {
+			if (mounted) {
+				onChange(state.values)
+			}
+			contextOnChange(newValues)
+		})
 	}
 
 	handleRemove = obsoleteName => {
 		let { onChange }                         = this.props
 		let { onRemove: contextOnRemove = noop } = this.context
 		let state                                = {}
+		let { mounted }                          = this
 
 		this.setState(function ({ values }) {
 			let { [obsoleteName]: obsoleteValue, ...cleanedValues } = values // eslint-disable-line no-unused-vars
 
 			state = { values: cleanedValues }
-
 			return state
 		}, function () {
-			onChange(state.values)
+			if (mounted) {
+				onChange(state.values)
+			}
 			contextOnRemove(obsoleteName)
 		})
 	}

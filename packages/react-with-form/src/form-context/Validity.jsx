@@ -44,11 +44,11 @@ export default class Validity extends React.PureComponent {
 		this.error       = undefined
 		this.nestedError = undefined
 		this.state       = {
-			disabled  : context.disabled,
-			validation: context.validation,
+			disabled : context.disabled,
+			validator: this.validator,
 			/* eslint-disable react/no-unused-state */
-			silent    : context.silent,
-			onChange  : this.handleNestedChange
+			silent   : context.silent,
+			onChange : this.handleNestedChange
 			/* eslint-enable */
 		}
 	}
@@ -58,20 +58,18 @@ export default class Validity extends React.PureComponent {
 	}
 
 	componentDidUpdate (previousProps, previousState) {
-		let { disabled, validation } = this.context
+		let { disabled }      = this.context
 		let {
 			name, value, checked, hint, valid, onValidate
 		} = this.props
-		let validator                = validation && validation[name]
-		let previousValidator        = previousState.validation && previousState.validation[name]
-		let nameChanged              = name !== previousProps.name
-		let valueChanged             = value !== previousProps.value
-		let checkedChanged           = checked !== previousProps.checked
-		let hintChanged              = hint !== previousProps.hint
-		let validChanged             = valid !== previousProps.valid
-		let validationChanged        = onValidate !== previousProps.onValidate
-		let disabledChanged          = disabled !== previousState.disabled
-		let validatorChanged         = validator !== previousValidator
+		let nameChanged       = name !== previousProps.name
+		let valueChanged      = value !== previousProps.value
+		let checkedChanged    = checked !== previousProps.checked
+		let hintChanged       = hint !== previousProps.hint
+		let validChanged      = valid !== previousProps.valid
+		let validationChanged = onValidate !== previousProps.onValidate
+		let disabledChanged   = disabled !== previousState.disabled
+		let validatorChanged  = this.validator !== previousState.validator
 
 		if (nameChanged
 			|| valueChanged
@@ -91,13 +89,20 @@ export default class Validity extends React.PureComponent {
 		this.handleChange()
 	}
 
+	get validator () {
+		let { name }       = this.props
+		let { validation } = this.context
+
+		return validation && validation[name]
+	}
+
 	validate () {
-		let { disabled, silent, validation } = this.context
+		let { disabled, silent }  = this.context
 		let {
 			value, valid, hint, onValidate, onValid, onInvalid
 		} = this.props
-		let hasOwnValid                      = valid !== undefined
-		let validationNotDisabled            = !disabled
+		let hasOwnValid           = valid !== undefined
+		let validationNotDisabled = !disabled
 
 		if (hasOwnValid) {
 			this.error = valid ? undefined : hint
@@ -115,7 +120,7 @@ export default class Validity extends React.PureComponent {
 		this.setState({
 			disabled,
 			silent, // eslint-disable-line react/no-unused-state
-			validation
+			validator: this.validator
 		})
 
 		if (this.error) {

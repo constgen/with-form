@@ -10,8 +10,6 @@ export default class Validity extends React.PureComponent {
 		name      : PropTypes.string,
 		value     : PropTypes.any,
 		checked   : PropTypes.bool,
-		hint      : PropTypes.any,
-		valid     : PropTypes.bool,
 		onValidate: PropTypes.func,
 		onValid   : PropTypes.func,
 		onInvalid : PropTypes.func,
@@ -21,8 +19,6 @@ export default class Validity extends React.PureComponent {
 		name      : undefined,
 		value     : undefined,
 		checked   : undefined,
-		hint      : undefined,
-		valid     : undefined,
 		onValidate: noop,
 		onValid   : noop,
 		onInvalid : noop,
@@ -38,17 +34,16 @@ export default class Validity extends React.PureComponent {
 		return valid ? undefined : validationMessage
 	}
 
-
 	constructor (props, context) {
 		super(props, context)
-		this.error       = undefined
-		this.nestedError = undefined
-		this.state       = {
-			disabled : context.disabled,
-			validator: this.validator,
+		this.error         = undefined
+		this.nestedError   = undefined
+		this.prevValidator = this.validator
+		this.state         = {
+			disabled: context.disabled,
 			/* eslint-disable react/no-unused-state */
-			silent   : context.silent,
-			onChange : this.handleNestedChange
+			silent  : context.silent,
+			onChange: this.handleNestedChange
 			/* eslint-enable */
 		}
 	}
@@ -61,23 +56,19 @@ export default class Validity extends React.PureComponent {
 		let { disabled, silent } = this.context
 		let { validator }        = this
 		let {
-			name, value, checked, hint, valid, onValidate
+			name, value, checked, onValidate
 		} = this.props
 		let nameChanged          = name !== previousProps.name
 		let valueChanged         = value !== previousProps.value
 		let checkedChanged       = checked !== previousProps.checked
-		let hintChanged          = hint !== previousProps.hint
-		let validChanged         = valid !== previousProps.valid
 		let validationChanged    = onValidate !== previousProps.onValidate
 		let disabledChanged      = disabled !== previousState.disabled
-		let validatorChanged     = validator !== previousState.validator
+		let validatorChanged     = validator !== this.prevValidator
 		let silentChanged        = silent !== previousState.silent
 
 		if (nameChanged
 			|| valueChanged
 			|| checkedChanged
-			|| hintChanged
-			|| validChanged
 			|| disabledChanged
 			|| validationChanged
 			|| validatorChanged
@@ -85,12 +76,12 @@ export default class Validity extends React.PureComponent {
 			this.validate()
 		}
 
-		if (disabledChanged || validatorChanged || silentChanged) {
-			this.setState({
-				disabled,
-				silent,
-				validator
-			})
+		if (validatorChanged) {
+			this.prevValidator = validator
+		}
+
+		if (disabledChanged || silentChanged) {
+			this.setState({ disabled, silent })
 		}
 	}
 
@@ -107,28 +98,24 @@ export default class Validity extends React.PureComponent {
 
 	validate () {
 		let { disabled }          = this.context
-		let {
-			value, valid, hint, onValidate
-		} = this.props
-		let hasOwnValid           = valid !== undefined
+		let { value, onValidate } = this.props
 		let validationNotDisabled = !disabled
 		let error
 
-		if (hasOwnValid) {
-			error = valid ? undefined : hint
+		if (validationNotDisabled) {
+			error = onValidate(value) || this.validateExternally(value)
 		}
-		else if (validationNotDisabled) {
-			error = onValidate(value)
-		}
-		else {
-			error = undefined
-		}
+
 		error = error || this.nestedError
-
-		// console.log({ error, nestedError: this.nestedError })
-
 		this.handleValidity(error)
 		return this.handleChange(error)
+	}
+
+	validateExternally (value) {
+		let { validator }             = this
+		let externalValidationMessage = validator && validator(value)
+
+		return externalValidationMessage || undefined
 	}
 
 	handleValidity = error => {
@@ -150,7 +137,11 @@ export default class Validity extends React.PureComponent {
 		let { name }        = this.props
 		let errorNotChanged = error === this.error
 
+
+		// console.log({ error, nestedError: this.nestedError, nested: !this.context.validation })
 		if (errorNotChanged) return
+
+		// console.warn({ error, nestedError: this.nestedError, nested: !this.context.validation })
 
 		this.error = error
 		if (name && onChange) {

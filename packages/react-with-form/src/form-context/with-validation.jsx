@@ -5,7 +5,7 @@ import ValidationContext from './ValidationContext'
 import Validity from './Validity'
 
 export default function withValidation (Component) {
-	class ValidationItem extends React.Component {
+	class ValidationItem extends React.PureComponent {
 		static displayName = Component.displayName || Component.name
 		static Origin = Component.Origin || Component
 		static contextType = ValidationContext
@@ -19,57 +19,79 @@ export default function withValidation (Component) {
 			valid  : undefined
 		}
 
+		static getDerivedStateFromProps (props, state) {
+			let { valid, hint } = props
+			let { error }       = state
+			let hasOwnValid     = valid !== undefined
+			let invalid         = hasOwnValid && !valid
+
+			if (hasOwnValid && invalid) {
+				error = hint
+			}
+			valid = !error
+			hint  = error || hint
+
+			return { valid, hint }
+		}
+
 		constructor (props, context) {
 			super(props, context)
 			this.field = props.innerRef || React.createRef()
 			this.state = {
-				valid: true,
+				valid: undefined,
+				hint : undefined,
 				error: undefined
 			}
 		}
 
 		handleInvalid = error => {
-			this.setState({ valid: false, error })
+			this.setState({ error })
 
 			return error
 		}
 
 		handleValid = () => {
-			this.setState({ valid: true, error: undefined })
+			this.setState({ error: undefined })
 		}
 
-		validate = value => {
+		validate = () => this.validateFromProps() || this.validateNative()
+
+		validateNative () {
 			let nativeElement = this.field.current
 
-			return Validity.validateDomElement(nativeElement) || this.validateExternally(value)
+			// console.log(`native validate ${Component.displayName || Component.name}`)
+			return Validity.validateDomElement(nativeElement)
 		}
 
-		validateExternally (value) {
-			let { name }                 = this.props
-			let { validation }           = this.context
-			let validator                = validation && validation[name]
-			let contextValidationMessage = validator && validator(value)
+		validateFromProps () {
+			let { validation }  = this.context
+			let { valid, hint } = this.props
+			let notNested       = Boolean(validation)
+			let hasOwnValid     = valid !== undefined
+			let invalid         = hasOwnValid && !valid
 
-			return contextValidationMessage || undefined
+			if (notNested && invalid) {
+				// console.log(`invalidate ${Component.displayName || Component.name}`)
+				return hint
+			}
 		}
 
 		render () {
-			let { hint, name, value, valid: validProp } = this.props
-			let { valid, error }                        = this.state
-			let { silent }                              = this.context
-			let statusHint                              = error || hint
+			let { hint: hintProp, name, value, checked } = this.props
+			let { valid, hint }                          = this.state
+			let { silent }                               = this.context
 
 			if (silent) {
-				valid      = true
-				statusHint = hint
+				valid = true
+				hint  = hintProp
 			}
 
+			// console.log(Component.displayName || Component.name, { valid, hint })
 			return (
 				<Validity
 					name={name}
 					value={value}
-					hint={hint}
-					valid={validProp}
+					checked={checked}
 					onValidate={this.validate}
 					onValid={this.handleValid}
 					onInvalid={this.handleInvalid}
@@ -78,7 +100,7 @@ export default function withValidation (Component) {
 						{...this.props}
 						innerRef={this.field}
 						valid={valid}
-						hint={statusHint}
+						hint={hint}
 					/>
 				</Validity>
 			)

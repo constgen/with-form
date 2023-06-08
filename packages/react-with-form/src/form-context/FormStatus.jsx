@@ -15,7 +15,7 @@ export default class FormStatus extends React.PureComponent {
 	static defaultProps = {
 		onChange   : noop,
 		onSubmitted: noop,
-		onFail     : console.error
+		onFail     : undefined
 	}
 	static STATUS = STATUS
 	constructor (props, context) {
@@ -40,19 +40,26 @@ export default class FormStatus extends React.PureComponent {
 		let status                    = STATUS.SUBMITTED
 		let { onChange, onSubmitted } = this.props
 
-		if (!this.mounted) return
-		this.setState({ status }) // eslint-disable-line react/no-unused-state
-		onSubmitted(result)
+		if (this.mounted) {
+			this.setState({ status }) // eslint-disable-line react/no-unused-state
+		}
 		onChange(status)
+		onSubmitted(result)
 	}
 	handleError = error => {
 		let status               = STATUS.FAILED
 		let { onChange, onFail } = this.props
 
-		if (!this.mounted) return
-		this.setState({ status }) // eslint-disable-line react/no-unused-state
-		onFail(error)
+		if (this.mounted) {
+			this.setState({ status }) // eslint-disable-line react/no-unused-state
+		}
 		onChange(status)
+		if (onFail) {
+			onFail(error)
+		}
+		else {
+			throw error
+		}
 	}
 	handleSubmit = promise => {
 		let { onChange }        = this.props
@@ -62,9 +69,7 @@ export default class FormStatus extends React.PureComponent {
 		this.setState({ status }) // eslint-disable-line react/no-unused-state
 		onChange(status)
 		onSubmit(
-			promise
-				.then(this.handleSubmitted)
-				.catch(this.handleError)
+			promise.then(this.handleSubmitted, this.handleError)
 		)
 	}
 

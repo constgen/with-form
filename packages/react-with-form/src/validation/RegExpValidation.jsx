@@ -6,11 +6,14 @@ import { FormData, FormValidation } from '../form-context'
 export default class RegExpValidation extends React.PureComponent {
 	static propTypes = {
 		children: PropTypes.node,
-		rules   : PropTypes.objectOf(PropTypes.oneOfType([
-			PropTypes.string,
-			PropTypes.node,
+		rules   : PropTypes.oneOfType([
+			PropTypes.objectOf(PropTypes.oneOfType([
+				PropTypes.string,
+				PropTypes.node,
+				PropTypes.func
+			]).isRequired),
 			PropTypes.func
-		]).isRequired),
+		]),
 		onChange : (FormValidation.propTypes || {}).onChange,
 		onValid  : (FormValidation.propTypes || {}).onValid,
 		onInvalid: (FormValidation.propTypes || {}).onInvalid,
@@ -30,7 +33,12 @@ export default class RegExpValidation extends React.PureComponent {
 		function validate (value) {
 			if (!value) return
 			let { className, rules } = props
-			let violation            = Object.entries(rules)
+
+			if (typeof rules === 'function') {
+				rules = rules(value)
+			}
+
+			let violation = Object.entries(rules)
 				.map(function toRegExp ([expression, message]) {
 					return {
 						expression: new RegExp(expression),

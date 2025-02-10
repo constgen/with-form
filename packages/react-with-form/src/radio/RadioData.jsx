@@ -15,12 +15,14 @@ export default class RadioData extends React.PureComponent {
 			PropTypes.number,
 			PropTypes.bool
 		]),
+		required: PropTypes.bool,
 		onChange: PropTypes.func,
 		children: PropTypes.node.isRequired
 	}
 	static defaultProps = {
 		disabled: undefined,
 		value   : undefined,
+		required: undefined,
 		onChange: noop
 	}
 

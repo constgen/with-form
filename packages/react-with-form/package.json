@@ -1,6 +1,7 @@
 {
 	"name": "react-with-form",
 	"version": "0.10.0",
+	"sideEffects": false,
 	"description": "React components to build forms",
 	"main": "dist/index.js",
 	"author": "Constantine Genchevsky <const.gen@gmail.com>",

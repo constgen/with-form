@@ -1,6 +1,7 @@
 {
 	"name": "vue-with-form",
 	"version": "0.1.0",
+	"sideEffects": false,
 	"private": true,
 	"description": "Vue component that extends all children with props",
 	"main": "dist/index.js",

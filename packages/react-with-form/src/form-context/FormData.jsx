@@ -39,13 +39,15 @@ export default class FormData extends React.Component {
 	}
 
 	componentDidMount () {
-		let { onChange } = this.props
-		let component    = this
+		let { onChange }                         = this.props
+		let { onChange: contextOnChange = noop } = this.context
+		let component                            = this
 
 		this.mounted = true
 		// eslint-disable-next-line react/no-did-mount-set-state
 		this.setState(null, function () {
 			onChange(component.values)
+			contextOnChange(component.values)
 		})
 	}
 

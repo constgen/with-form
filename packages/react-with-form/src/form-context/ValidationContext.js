@@ -7,4 +7,6 @@ let ValidationContext = React.createContext({
 	onChange  : undefined
 })
 
+ValidationContext.displayName = 'ValidationContext'
+
 export default ValidationContext

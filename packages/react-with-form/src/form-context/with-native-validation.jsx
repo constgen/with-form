@@ -3,6 +3,10 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
 
 import ValidationContext from './ValidationContext'
 
+/**
+ * @param Component
+ * @deprecated
+ */
 export default function withNativeValidation (Component) {
 	class ValidationItem extends React.Component {
 		static displayName = Component.displayName || Component.name

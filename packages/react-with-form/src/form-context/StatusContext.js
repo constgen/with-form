@@ -15,4 +15,6 @@ let StatusContext = React.createContext({
 	onSubmit: noop
 })
 
+StatusContext.displayName = 'StatusContext'
+
 export default StatusContext

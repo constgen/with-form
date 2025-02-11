@@ -9,4 +9,6 @@ let RadioContext = React.createContext({
 	onChange: noop
 })
 
+RadioContext.displayName = 'RadioContext'
+
 export default RadioContext

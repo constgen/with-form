@@ -42,6 +42,7 @@ jobs:
           node-version: 20.x
           cache: 'pnpm'
           cache-dependency-path: '**/package.json'
+          registry-url: https://registry.npmjs.org/ # Required for publishing
       - name: 🔧 Install dependencies
         run: pnpm install
       - name: 📦 Build

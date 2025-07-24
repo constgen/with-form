@@ -1,18 +1,23 @@
-import React from 'react'
+import { Component } from 'react'
 import PropTypes from 'prop-types'
 
 import DataContext from './DataContext'
 import noop from '../utils/noop'
+import merge from '../utils/merge'
 
-export default class FormData extends React.Component {
+let EMPTY_VALUES = Object.freeze({})
+
+export default class FormData extends Component {
 	static contextType = DataContext
 	static propTypes = {
+		name    : PropTypes.string,
 		values  : PropTypes.object,
 		children: PropTypes.node.isRequired,
 		onChange: PropTypes.func
 	}
 	static defaultProps = {
-		values  : {},
+		name    : undefined,
+		values  : EMPTY_VALUES,
 		onChange: noop
 	}
 	static getDerivedStateFromProps (props, state) {
@@ -20,7 +25,7 @@ export default class FormData extends React.Component {
 
 		if (values !== state.initialValues) {
 			return {
-				values       : { ...state.values, ...values },
+				values       : merge(state.values, values),
 				initialValues: values
 			}
 		}
@@ -30,8 +35,8 @@ export default class FormData extends React.Component {
 		super(props, context)
 
 		this.state   = {
-			values       : {},
-			initialValues: {},
+			values       : EMPTY_VALUES,
+			initialValues: EMPTY_VALUES,
 			onChange     : this.handleChange,
 			onRemove     : this.handleRemove
 		}
@@ -39,55 +44,71 @@ export default class FormData extends React.Component {
 	}
 
 	componentDidMount () {
-		let { onChange }                         = this.props
-		let { onChange: contextOnChange = noop } = this.context
-		let component                            = this
+		let { onChange } = this.props
+		let component    = this
 
 		this.mounted = true
 		// eslint-disable-next-line react/no-did-mount-set-state
 		this.setState(null, function () {
-			onChange(component.values)
-			contextOnChange(component.values)
+			let { values } = component
+
+			onChange(values)
+			component.handleContextChange(values)
 		})
 	}
 
-	get values () {
-		let { defaultProps }          = FormData
-		let { context, state, props } = this
-		let valuesAreUncontrolled     = props.values === defaultProps.values
-		let contextValuesAreDefined   = context.values && context.values !== defaultProps.values
+	componentWillUnmount () {
+		let { name } = this.props
 
+		this.mounted = false
+
+		if (name) {
+			this.handleContextRemove(name)
+		}
+	}
+
+	get values () {
+		let { context, state }      = this
+		let { name, values }        = this.props
+		let valuesAreUncontrolled   = values === EMPTY_VALUES
+		let contextValues           = name && context.values ? context.values[name] : context.values
+		let contextValuesAreDefined = contextValues && contextValues !== EMPTY_VALUES
+
+		// console.log(contextValues ? 'nested' : 'parent', {
+		// 	stateValues  : JSON.stringify(state.values),
+		// 	contextValues: JSON.stringify(contextValues)
+		// })
 		if (contextValuesAreDefined && valuesAreUncontrolled) {
-			return { ...state.values, ...context.values }
+			return merge(state.values, contextValues)
 		}
 		if (contextValuesAreDefined) {
-			return { ...context.values, ...state.values }
+			return merge(contextValues, state.values)
 		}
 		return state.values
 	}
 
 	handleChange = newValues => {
-		let { onChange }                         = this.props
-		let { onChange: contextOnChange = noop } = this.context
-		let { mounted }                          = this
-		let state                                = { }
+		let { onChange } = this.props
+		let { mounted }  = this
+		let component    = this
+		let state        = { }
 
 		this.setState(function ({ values }) {
-			state = { values: { ...values, ...newValues } }
+			state = { values: merge(values, newValues) }
 			return state
 		}, function () {
 			if (mounted) {
 				onChange(state.values)
 			}
-			contextOnChange(newValues)
+			component.handleContextChange(newValues)
 		})
 	}
 
 	handleRemove = obsoleteName => {
-		let { onChange }                         = this.props
-		let { onRemove: contextOnRemove = noop } = this.context
-		let state                                = {}
-		let { mounted }                          = this
+		let { onChange } = this.props
+		let state        = {}
+		let { mounted }  = this
+		let component    = this
 
 		this.setState(function ({ values }) {
 			let { [obsoleteName]: obsoleteValue, ...cleanedValues } = values // eslint-disable-line no-unused-vars
@@ -98,8 +119,40 @@ export default class FormData extends React.Component {
 			if (mounted) {
 				onChange(state.values)
 			}
-			contextOnRemove(obsoleteName)
+			component.handleContextRemove(obsoleteName)
 		})
+	}
+
+	handleContextChange (obsoleteName) {
+		let { name }                      = this.props
+		let { onChange: contextOnChange } = this.context
+
+		if (!contextOnChange) return
+
+		if (name) {
+			let { values } = this.state
+
+			contextOnChange({ [name]: values })
+		}
+		else {
+			contextOnChange(obsoleteName)
+		}
+	}
+
+	handleContextRemove (obsoleteName) {
+		let { name }                                                 = this.props
+		let { onRemove: contextOnRemove, onChange: contextOnChange } = this.context
+
+		if (!contextOnRemove) return
+
+		if (name) {
+			let { values } = this.state
+
+			contextOnChange({ [name]: values })
+		}
+		else {
+			contextOnRemove(obsoleteName)
+		}
 	}
 
 	render () {

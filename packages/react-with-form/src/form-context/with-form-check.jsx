@@ -1,8 +1,10 @@
 import React from 'react'
 import hoistNonReactStatics from 'hoist-non-react-statics'
+import PropTypes from 'prop-types'
 
 import DataContext from './DataContext'
 import noop from '../utils/noop'
+import isDefined from '../utils/is-defined'
 
 let emptyContext = {}
 
@@ -11,7 +13,12 @@ export default function withFormCheck (Component) {
 		static displayName = Component.displayName || Component.name
 		static Origin = Component.Origin || Component
 		static contextType = DataContext
-		static propTypes = Component.propTypes
+		static propTypes = {
+			name    : PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+			value   : PropTypes.any,
+			checked : PropTypes.bool,
+			onChange: PropTypes.func
+		}
 		static defaultProps = {
 			...Component.defaultProps,
 			name    : undefined,
@@ -21,25 +28,27 @@ export default function withFormCheck (Component) {
 		}
 
 		componentDidMount () {
-			let { onChange: contextOnChange, values } = this.context
+			let { onUpdate: contextOnUpdate, values } = this.context
 			let { name, value, checked }              = this.props
 			let hasOwnChecked                         = checked !== undefined
 			let hasContextValue                       = values && (name in values)
 			let hasNotContextValue                    = !hasContextValue
-			let contextValue                          = hasContextValue ? values[name] : undefined
 
-			if (!(name && contextOnChange)) return
+			if (!(isDefined(name) && contextOnUpdate)) return
 
 			if (hasOwnChecked && hasContextValue) {
-				contextOnChange({ [name]: checked ? contextValue : undefined })
+				contextOnUpdate({ [name]: checked ? values[name] : undefined })
 			}
 			else if (hasOwnChecked || hasNotContextValue) {
-				contextOnChange({ [name]: checked ? value : undefined })
+				contextOnUpdate({ [name]: checked ? value : undefined })
+			}
+			else {
+				contextOnUpdate({ [name]: undefined })
 			}
 		}
 
 		componentDidUpdate (previousProps) {
-			let { onChange: contextOnChange, values } = this.context
+			let { onUpdate: contextOnUpdate, values } = this.context
 			let { name, value, checked }              = this.props
 			let hasOwnChecked                         = checked !== undefined
 			let newCheckPassed                        = checked !== previousProps.checked
@@ -48,9 +57,9 @@ export default function withFormCheck (Component) {
 			// let contextValue = values && values[name]
 			// let valueChanged = value !== contextValue
 			value = checked ? value : undefined
-			if (name && contextOnChange && hasOwnChecked && (newCheckPassed || hasNotContextValue)) {
+			if (isDefined(name) && contextOnUpdate && hasOwnChecked && (newCheckPassed || hasNotContextValue)) {
 				// console.info('updates', { name, value, newValuePassed, hasNotContextValue });
-				contextOnChange({ [name]: value })
+				contextOnUpdate({ [name]: value })
 			}
 		}
 
@@ -58,17 +67,17 @@ export default function withFormCheck (Component) {
 			let { onRemove: contextOnRemove } = this.context
 			let { name }                      = this.props
 
-			if (name && contextOnRemove) {
+			if (isDefined(name) && contextOnRemove) {
 				contextOnRemove(name)
 			}
 		}
 
 		handleChange = value => {
 			let { name, onChange } = this.props
-			let contextOnChange    = this.context.onChange
+			let contextOnUpdate    = this.context.onUpdate
 
-			if (name && contextOnChange) {
-				contextOnChange({ [name]: value })
+			if (isDefined(name) && contextOnUpdate) {
+				contextOnUpdate({ [name]: value })
 			}
 			return onChange(value)
 		}

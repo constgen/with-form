@@ -3,14 +3,18 @@ import PropTypes from 'prop-types'
 
 import DataContext from './DataContext'
 import noop from '../utils/noop'
+import deepMerge from '../utils/deep-merge'
 import merge from '../utils/merge'
+import omit from '../utils/omit'
+
+export let EMPTY = Symbol('EMPTY')
 
 let EMPTY_VALUES = Object.freeze({})
 
 export default class FormData extends Component {
 	static contextType = DataContext
 	static propTypes = {
-		name    : PropTypes.string,
+		name    : PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 		values  : PropTypes.object,
 		children: PropTypes.node.isRequired,
 		onChange: PropTypes.func
@@ -20,12 +24,13 @@ export default class FormData extends Component {
 		values  : EMPTY_VALUES,
 		onChange: noop
 	}
+	static [EMPTY] = EMPTY_VALUES
 	static getDerivedStateFromProps (props, state) {
 		let { values } = props
 
 		if (values !== state.initialValues) {
 			return {
-				values       : merge(state.values, values),
+				values       : deepMerge(state.values, values),
 				initialValues: values
 			}
 		}
@@ -33,11 +38,13 @@ export default class FormData extends Component {
 	}
 	constructor (props, context) {
 		super(props, context)
+		let empty = this.constructor[EMPTY]
 
 		this.state   = {
-			values       : EMPTY_VALUES,
-			initialValues: EMPTY_VALUES,
-			onChange     : this.handleChange,
+			values       : empty,
+			initialValues: empty,
+			onUpdate     : this.handleUpdate,
+			onReplace    : this.handleReplace,
 			onRemove     : this.handleRemove
 		}
 		this.mounted = false
@@ -50,10 +57,10 @@ export default class FormData extends Component {
 		this.mounted = true
 		// eslint-disable-next-line react/no-did-mount-set-state
 		this.setState(null, function () {
-			let { values } = component
+			let { values } = component.state
 
 			onChange(values)
-			component.handleContextChange(values)
+			component.contextUpdate(values)
 		})
 	}
 
@@ -63,92 +70,138 @@ export default class FormData extends Component {
 		this.mounted = false
 
 		if (name) {
-			this.handleContextRemove(name)
+			this.contextRemove(name)
 		}
 	}
 
-	get values () {
+	get collectionValues () {
+		let empty                   = this.constructor[EMPTY]
 		let { context, state }      = this
 		let { name, values }        = this.props
-		let valuesAreUncontrolled   = values === EMPTY_VALUES
+		let valuesAreUncontrolled   = values === empty
 		let contextValues           = name && context.values ? context.values[name] : context.values
-		let contextValuesAreDefined = contextValues && contextValues !== EMPTY_VALUES
+		let contextValuesAreDefined = contextValues && contextValues !== empty
 
 		// console.log(contextValues ? 'nested' : 'parent', {
 		// 	stateValues  : JSON.stringify(state.values),
 		// 	contextValues: JSON.stringify(contextValues)
 		// })
 		if (contextValuesAreDefined && valuesAreUncontrolled) {
-			return merge(state.values, contextValues)
+			return deepMerge(state.values, contextValues)
 		}
 		if (contextValuesAreDefined) {
-			return merge(contextValues, state.values)
+			return deepMerge(contextValues, state.values)
 		}
 		return state.values
 	}
 
-	handleChange = newValues => {
+	handleUpdate = newValues => {
 		let { onChange } = this.props
 		let { mounted }  = this
 		let component    = this
 		let state        = { }
 
+		// console.log('newValues', newValues, this.state.values)
 		this.setState(function ({ values }) {
-			state = { values: merge(values, newValues) }
-			return state
+			// console.log('newValues2', newValues, values)
+			state            = { values: deepMerge(values, newValues) }
+			let stateChanged = state.values !== values
+
+			return stateChanged ? state : null
 		}, function () {
+			// console.log('newValues3', newValues, state.values)
 			if (mounted) {
 				onChange(state.values)
 			}
-			component.handleContextChange(newValues)
+			component.contextUpdate(newValues)
+		})
+	}
+
+	handleReplace = newValues => {
+		let { onChange } = this.props
+		let { mounted }  = this
+		let component    = this
+		let state        = { }
+
+		// console.log('newValues', newValues, this.state.values)
+		this.setState(function ({ values }) {
+			state = { values: merge(values, newValues) }
+
+			let stateChanged = state.values !== values
+
+			return stateChanged ? state : null
+		}, function () {
+			// console.log('newValues3', newValues, state.values)
+			if (mounted) {
+				onChange(state.values)
+			}
+			component.contextReplace(newValues)
 		})
 	}
 
 	handleRemove = obsoleteName => {
 		let { onChange } = this.props
-		let state        = {}
 		let { mounted }  = this
 		let component    = this
+		let state        = {}
+
 
 		this.setState(function ({ values }) {
-			let { [obsoleteName]: obsoleteValue, ...cleanedValues } = values // eslint-disable-line no-unused-vars
+			state            = { values: omit(values, obsoleteName) }
+			let stateChanged = state.values !== values
 
-			state = { values: cleanedValues }
-			return state
+			// console.log('remove', obsoleteName, values, state.values)
+			return stateChanged ? state : null
 		}, function () {
 			if (mounted) {
 				onChange(state.values)
 			}
-			component.handleContextRemove(obsoleteName)
+			component.contextRemove(obsoleteName)
 		})
 	}
 
-	handleContextChange (obsoleteName) {
+	contextUpdate (newValues) {
 		let { name }                      = this.props
-		let { onChange: contextOnChange } = this.context
+		let { onUpdate: contextOnUpdate } = this.context
 
-		if (!contextOnChange) return
+		if (!contextOnUpdate) return
 
 		if (name) {
 			let { values } = this.state
 
-			contextOnChange({ [name]: values })
+			contextOnUpdate({ [name]: values })
 		}
 		else {
-			contextOnChange(obsoleteName)
+			contextOnUpdate(newValues)
 		}
 	}
 
-	handleContextRemove (obsoleteName) {
-		let { name }                                                 = this.props
-		let { onRemove: contextOnRemove, onChange: contextOnChange } = this.context
+	contextReplace (newValues) {
+		let { name }                        = this.props
+		let { onReplace: contextOnReplace } = this.context
+
+		if (!contextOnReplace) return
+
+		if (name) {
+			let { values } = this.state
+
+			contextOnReplace({ [name]: values })
+		}
+		else {
+			contextOnReplace(newValues)
+		}
+	}
+
+	contextRemove (obsoleteName) {
+		let { name }                                                   = this.props
+		let { onRemove: contextOnRemove, onReplace: contextOnReplace } = this.context
 
 		if (!contextOnRemove) return
 
 		if (name) {
 			let { values } = this.state
 
-			contextOnChange({ [name]: values })
+			contextOnReplace({ [name]: values })
 		}
 		else {
 			contextOnRemove(obsoleteName)
@@ -156,23 +209,26 @@ export default class FormData extends Component {
 	}
 
 	render () {
-		let { children }                   = this.props
-		let { values, onChange, onRemove } = this.state
-		let combinatedValues               = this.values
-		let conextValuesIsUsed             = values !== combinatedValues
-		let providerValue                  = this.state
+		let {
+			values, onChange, onRemove, onReplace, onUpdate
+		} = this.state
+		let { collectionValues } = this
+		let conextValuesIsUsed   = values !== collectionValues
+		let providerValue        = this.state
 
 		if (conextValuesIsUsed) {
 			providerValue = {
-				values: combinatedValues,
+				values: collectionValues,
 				onChange,
+				onUpdate,
+				onReplace,
 				onRemove
 			}
 		}
 
 		return (
 			<DataContext.Provider value={providerValue}>
-				{children}
+				{this.props.children}
 			</DataContext.Provider>
 		)
 	}

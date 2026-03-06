@@ -210,7 +210,7 @@ export default class FormData extends Component {
 
 	render () {
 		let {
-			values, onChange, onRemove, onReplace, onUpdate
+			values, onRemove, onReplace, onUpdate
 		} = this.state
 		let { collectionValues } = this
 		let conextValuesIsUsed   = values !== collectionValues
@@ -219,7 +219,6 @@ export default class FormData extends Component {
 		if (conextValuesIsUsed) {
 			providerValue = {
 				values: collectionValues,
-				onChange,
 				onUpdate,
 				onReplace,
 				onRemove

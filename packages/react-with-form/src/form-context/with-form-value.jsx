@@ -25,37 +25,37 @@ export default function withFormValue (Component) {
 		}
 
 		componentDidMount () {
-			let { onUpdate: contextOnUpdate, values } = this.context
-			let { name, value }                       = this.props
-			let hasOwnValue                           = value !== undefined
-			let hasContextValue                       = (values && (name in values))
+			let { onReplace: contextOnReplace, values } = this.context
+			let { name, value }                         = this.props
+			let hasOwnValue                             = value !== undefined
+			let hasContextValue                         = (values && (name in values))
 
-			if (isDefined(name) && contextOnUpdate) {
+			if (isDefined(name) && contextOnReplace) {
 				// console.info('mount', { name, value, hasOwnValue, hasContextValue })
 				if (hasOwnValue) {
-					contextOnUpdate({ [name]: value })
+					contextOnReplace({ [name]: value })
 				}
 				else if (hasContextValue) {
-					contextOnUpdate({ [name]: values[name] })
+					contextOnReplace({ [name]: values[name] })
 				}
 				else {
-					contextOnUpdate({ [name]: undefined })
+					contextOnReplace({ [name]: undefined })
 				}
 			}
 		}
 
 		componentDidUpdate (previousProps) {
-			let { onUpdate: contextOnUpdate, values } = this.context
-			let { name, value }                       = this.props
-			let hasOwnValue                           = value !== undefined
-			let newValuePassed                        = value !== previousProps.value
-			let hasNotContextValue                    = !(values && (name in values))
+			let { onReplace: contextOnReplace, values } = this.context
+			let { name, value }                         = this.props
+			let hasOwnValue                             = value !== undefined
+			let newValuePassed                          = value !== previousProps.value
+			let hasNotContextValue                      = !(values && (name in values))
 			// let contextValue = values && values[name]
 			// let valueChanged = value !== contextValue
 
-			if (isDefined(name) && contextOnUpdate && hasOwnValue && (newValuePassed || hasNotContextValue)) {
+			if (isDefined(name) && contextOnReplace && hasOwnValue && (newValuePassed || hasNotContextValue)) {
 				// console.info('updates', { name, value, newValuePassed, hasNotContextValue })
-				contextOnUpdate({ [name]: value })
+				contextOnReplace({ [name]: value })
 			}
 		}
 
@@ -70,10 +70,10 @@ export default function withFormValue (Component) {
 
 		handleChange = value => {
 			let { name, onChange } = this.props
-			let contextOnUpdate    = this.context.onUpdate
+			let contextOnReplace   = this.context.onReplace
 
-			if (isDefined(name) && contextOnUpdate) {
-				contextOnUpdate({ [name]: value })
+			if (isDefined(name) && contextOnReplace) {
+				contextOnReplace({ [name]: value })
 			}
 			return onChange(value)
 		}

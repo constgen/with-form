@@ -28,38 +28,38 @@ export default function withFormCheck (Component) {
 		}
 
 		componentDidMount () {
-			let { onUpdate: contextOnUpdate, values } = this.context
-			let { name, value, checked }              = this.props
-			let hasOwnChecked                         = checked !== undefined
-			let hasContextValue                       = values && (name in values)
-			let hasNotContextValue                    = !hasContextValue
+			let { onReplace: contextOnReplace, values } = this.context
+			let { name, value, checked }                = this.props
+			let hasOwnChecked                           = checked !== undefined
+			let hasContextValue                         = values && (name in values)
+			let hasNotContextValue                      = !hasContextValue
 
-			if (!(isDefined(name) && contextOnUpdate)) return
+			if (!(isDefined(name) && contextOnReplace)) return
 
 			if (hasOwnChecked && hasContextValue) {
-				contextOnUpdate({ [name]: checked ? values[name] : undefined })
+				contextOnReplace({ [name]: checked ? values[name] : undefined })
 			}
 			else if (hasOwnChecked || hasNotContextValue) {
-				contextOnUpdate({ [name]: checked ? value : undefined })
+				contextOnReplace({ [name]: checked ? value : undefined })
 			}
 			else {
-				contextOnUpdate({ [name]: undefined })
+				contextOnReplace({ [name]: undefined })
 			}
 		}
 
 		componentDidUpdate (previousProps) {
-			let { onUpdate: contextOnUpdate, values } = this.context
-			let { name, value, checked }              = this.props
-			let hasOwnChecked                         = checked !== undefined
-			let newCheckPassed                        = checked !== previousProps.checked
-			let hasNotContextValue                    = !(values && (name in values))
+			let { onReplace: contextOnReplace, values } = this.context
+			let { name, value, checked }                = this.props
+			let hasOwnChecked                           = checked !== undefined
+			let newCheckPassed                          = checked !== previousProps.checked
+			let hasNotContextValue                      = !(values && (name in values))
 
 			// let contextValue = values && values[name]
 			// let valueChanged = value !== contextValue
 			value = checked ? value : undefined
-			if (isDefined(name) && contextOnUpdate && hasOwnChecked && (newCheckPassed || hasNotContextValue)) {
+			if (isDefined(name) && contextOnReplace && hasOwnChecked && (newCheckPassed || hasNotContextValue)) {
 				// console.info('updates', { name, value, newValuePassed, hasNotContextValue });
-				contextOnUpdate({ [name]: value })
+				contextOnReplace({ [name]: value })
 			}
 		}
 
@@ -74,10 +74,10 @@ export default function withFormCheck (Component) {
 
 		handleChange = value => {
 			let { name, onChange } = this.props
-			let contextOnUpdate    = this.context.onUpdate
+			let contextOnReplace   = this.context.onReplace
 
-			if (isDefined(name) && contextOnUpdate) {
-				contextOnUpdate({ [name]: value })
+			if (isDefined(name) && contextOnReplace) {
+				contextOnReplace({ [name]: value })
 			}
 			return onChange(value)
 		}

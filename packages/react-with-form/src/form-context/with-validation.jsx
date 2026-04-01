@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import hoistNonReactStatics from 'hoist-non-react-statics'
 
 import ValidationContext from './ValidationContext'
@@ -9,7 +10,10 @@ export default function withValidation (Component) {
 		static displayName = Component.displayName || Component.name
 		static Origin = Component.Origin || Component
 		static contextType = ValidationContext
-		static propTypes = Component.propTypes
+		static propTypes = {
+			...Component.propTypes,
+			innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
+		}
 		static defaultProps = {
 			...Component.defaultProps,
 			name   : undefined,

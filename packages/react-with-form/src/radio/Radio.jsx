@@ -8,18 +8,19 @@ export default class Radio extends React.PureComponent {
 	static contextType = RadioContext
 	static propTypes = {
 		className: PropTypes.string,
-		value    : PropTypes.oneOfType([
-			PropTypes.string,
-			PropTypes.number,
-			PropTypes.bool
-		]).isRequired,
-		disabled: PropTypes.bool,
-		onClick : PropTypes.func
+		value    : PropTypes.any.isRequired,
+		disabled : PropTypes.bool,
+		onClick  : PropTypes.func
 	}
 	static defaultProps = {
 		className: '',
 		disabled : false,
 		onClick  : noop
+	}
+	static index = -1
+	constructor (props, context) {
+		super(props, context)
+		this.index = ++Radio.index
 	}
 	handleChange = () => {
 		let { onChange } = this.context
@@ -29,23 +30,37 @@ export default class Radio extends React.PureComponent {
 			onChange(value)
 		}
 	}
+	get htmlValue () {
+		let { value } = this.props
+		let valueType = typeof value
+
+		if (valueType === 'number' || valueType === 'boolean' || valueType === 'string') {
+			return value
+		}
+
+		return `[object_${this.index}]`
+	}
 	render () {
-		let { context, handleChange }                                = this
-		let { value: contextValue, disabled: contextDisabled, name } = context
-		let { className, disabled, onClick, value }                  = this.props
-		let checked                                                  = value === contextValue
+		let {
+			value: contextValue, disabled: contextDisabled, name, required, field
+		} = this.context
+
+		let { className, disabled, onClick, value } = this.props
+		let checked                                 = value === contextValue
 
 		disabled = contextDisabled || disabled
 
 		return (
 			<input
+				ref={field}
 				type="radio"
 				name={name}
 				className={className}
 				value={value}
 				checked={checked}
 				disabled={disabled}
-				onChange={handleChange}
+				required={required}
+				onChange={this.handleChange}
 				onClick={onClick}
 			/>
 		)

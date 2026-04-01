@@ -6,7 +6,9 @@ let RadioContext = React.createContext({
 	value   : undefined,
 	disabled: undefined,
 	name    : undefined,
-	onChange: noop
+	required: undefined,
+	onChange: noop,
+	field   : undefined
 })
 
 RadioContext.displayName = 'RadioContext'

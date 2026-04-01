@@ -3,40 +3,42 @@ import PropTypes from 'prop-types'
 
 import noop from '../utils/noop'
 import RadioContext from './RadioContext'
-import { withFormValue } from '../form-context'
+import { withFormValue, withValidation } from '../form-context'
 
 @withFormValue
+@withValidation
 export default class RadioData extends React.PureComponent {
 	static propTypes = {
 		disabled: PropTypes.bool,
 		name    : PropTypes.string.isRequired,
-		value   : PropTypes.oneOfType([
-			PropTypes.string,
-			PropTypes.number,
-			PropTypes.bool
-		]),
+		value   : PropTypes.any,
 		required: PropTypes.bool,
 		onChange: PropTypes.func,
-		children: PropTypes.node.isRequired
+		children: PropTypes.node.isRequired,
+		innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 	}
 	static defaultProps = {
 		disabled: undefined,
 		value   : undefined,
 		required: undefined,
-		onChange: noop
+		onChange: noop,
+		innerRef: undefined
 	}
 
 	static getDerivedStateFromProps (props, state) {
-		let { value, disabled, name } = props
-		let valueIsUpdated            = value !== undefined && value !== state.value
-		let disabledIsUpdated         = disabled !== undefined && disabled !== state.disabled
-		let nameIsUpdated             = name !== undefined && name !== state.name
+		let { value, disabled, name, required } = props
 
-		if (valueIsUpdated || disabledIsUpdated || nameIsUpdated) {
+		let valueIsUpdated    =  value !== state.value
+		let disabledIsUpdated =  disabled !== state.disabled
+		let nameIsUpdated     =  name !== state.name
+		let requiredIsUpdated =  required !== state.required
+
+		if (valueIsUpdated || disabledIsUpdated || nameIsUpdated || requiredIsUpdated) {
 			return {
 				value,
 				disabled,
-				name
+				name,
+				required
 			}
 		}
 
@@ -46,14 +48,18 @@ export default class RadioData extends React.PureComponent {
 	constructor (props, context) {
 		super(props, context)
 
-		let { value, disabled, name } = this.props
+		let {
+			value, disabled, name, required, innerRef
+		} = this.props
 
 		/* eslint-disable react/no-unused-state */
 		this.state = {
 			value,
 			disabled,
 			name,
-			onChange: this.handleChange
+			required,
+			onChange: this.handleChange,
+			field   : innerRef || React.createRef()
 		}
 		/* eslint-enable */
 	}

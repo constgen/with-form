@@ -32,7 +32,8 @@
 		"neutrino": "9.5.0",
 		"webpack": "^4.42.1",
 		"@constgen/eslint": "3.2.0",
-		"eslint": "7.18.0"
+		"eslint": "7.18.0",
+		"browserslist": "4.21.0"
 	},
 	"engines": {
 		"npm": ">=5.4.0",
